@@ -40,6 +40,26 @@ public class GameMain extends JPanel {
                             && board.cells[row][col].content == Seed.NO_SEED) {
                         // Update cells[][] and return the new game state after the move
                         currentState = board.stepGame(currentPlayer, row, col);
+
+                        if (currentPlayer == Seed.CROSS) {
+                            SoundEffect.CROSS_SOUND.play();
+                        } else {
+                            SoundEffect.NOUGH_SOUND.play();
+                        }
+
+                        if (currentState == State.CROSS_WON) {
+                            SoundEffect.CROSSWIN_SOUND.play();
+                            SoundEffect.BACKGROUND.stop();
+                            // Hentikan suara latar
+                        } else if (currentState == State.NOUGHT_WON) {
+                            SoundEffect.NOUGHWIN_SOUND.play();
+                            SoundEffect.BACKGROUND.stop();
+                            // Hentikan suara latar
+                        }else if (currentState == State.DRAW) {
+                            SoundEffect.DRAW_SOUND.play();
+                            SoundEffect.BACKGROUND.stop();
+                            // Hentikan suara latar jika permainan berakhir
+                        }
                         // Switch player
                         currentPlayer = (currentPlayer == Seed.CROSS) ? Seed.NOUGHT : Seed.CROSS;
                     }
@@ -69,6 +89,8 @@ public class GameMain extends JPanel {
         // Set up Game
         initGame();
         newGame();
+
+        SoundEffect.BACKGROUND.loop();
     }
 
     /** Initialize the game (run once) */
@@ -85,6 +107,8 @@ public class GameMain extends JPanel {
         }
         currentPlayer = Seed.CROSS;    // cross plays first
         currentState = State.PLAYING;  // ready to play
+
+        SoundEffect.BACKGROUND.loop();
     }
 
     /** Custom painting codes on this JPanel */
@@ -112,7 +136,7 @@ public class GameMain extends JPanel {
     }
 
     /** The entry "main" method */
-    public static void main(String[] args) {
+    public static void play() {
         // Run GUI construction codes in Event-Dispatching thread for thread safety
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
