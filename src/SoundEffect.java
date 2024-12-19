@@ -6,9 +6,6 @@ import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 public enum SoundEffect {
-//    EAT_FOOD("audio/eatfood.wav"),
-//    EXPLODE("audio/explode.wav"),
-//    DIE("audio/die.wav"),
     BACKGROUND("audio/game_music.wav"),
     CROSS_SOUND("audio/cross_placed.wav"),
     NOUGH_SOUND("audio/nough_placed.wav"),

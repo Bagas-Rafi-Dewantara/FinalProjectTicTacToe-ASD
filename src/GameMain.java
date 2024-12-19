@@ -23,6 +23,8 @@ public class GameMain {
             this.computerAI = new ComputerAI();
             this.computerAI.setLevel(aiLevel);
         }
+
+        SoundEffect.BACKGROUND.loop();
     }
 
     public void start() {
@@ -40,6 +42,7 @@ public class GameMain {
         }
 
         frame.setVisible(true);
+        SoundEffect.BACKGROUND.loop();
     }
 
     private void handleMove(int row, int col) {
@@ -49,14 +52,30 @@ public class GameMain {
         board.makeMove(row, col, currentPlayerToken);
         buttons[row][col].setText(currentPlayerToken.toString());
 
+        //Menambahkan bunyi saat CROSS ataupun NOUGH diletakkan
+        if (currentPlayerToken == Token.X) {
+            SoundEffect.CROSS_SOUND.play();
+        } else {
+            SoundEffect.NOUGH_SOUND.play();
+        }
+
         if (board.isWinningMove(currentPlayerToken)) {
-            JOptionPane.showMessageDialog(frame, (isPlayer1Turn ? "Player 1" : isPlayerVsComputer ? "Computer" : "Player 2") + " wins!");
+            String winner = isPlayer1Turn ? "Player 1" : isPlayerVsComputer ? "Computer" : "Player 2";
+            if (currentPlayerToken == Token.X) {
+                SoundEffect.CROSSWIN_SOUND.play();
+            } else {
+                SoundEffect.NOUGHWIN_SOUND.play();
+            }
+            JOptionPane.showMessageDialog(frame, winner + " wins!");
+            SoundEffect.BACKGROUND.stop();
             resetGame();
             return;
         }
 
         if (board.isGameOver()) {
+            SoundEffect.DRAW_SOUND.play();
             JOptionPane.showMessageDialog(frame, "It's a draw!");
+            SoundEffect.BACKGROUND.stop();
             resetGame();
             return;
         }
