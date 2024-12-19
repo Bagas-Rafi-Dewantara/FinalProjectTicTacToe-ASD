@@ -1,3 +1,5 @@
+package TicTacToe;
+
 public class Board {
     private Token[][] board;
 

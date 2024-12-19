@@ -1,7 +1,11 @@
+package TicTacToe;
+
+import TicTacToe.AILevel;
+import TicTacToe.Board;
+import TicTacToe.ComputerAI;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class GameMain {
     private Board board;
@@ -81,3 +85,4 @@ public class GameMain {
         start();
     }
 }
+

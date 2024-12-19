@@ -1,7 +1,10 @@
+package TicTacToe;
+
+import TicTacToe.AILevel;
+import TicTacToe.Board;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class GameUI {
     private JFrame frame;
@@ -60,3 +63,4 @@ public class GameUI {
         game.start();
     }
 }
+

@@ -1,3 +1,5 @@
+package TicTacToe;
+
 /**
  * @author Maxx Boehme
  * @version 1
@@ -7,3 +9,4 @@
 public enum Token {
     X, O, Empty
 }
+
