@@ -1,153 +1,83 @@
-import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
-/**
- * Tic-Tac-Toe: Two-player Graphic version with better OO design.
- * The Board and Cell classes are separated in their own classes.
- */
-public class GameMain extends JPanel {
-    private static final long serialVersionUID = 1L; // to prevent serializable warning
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-    // Define named constants for the drawing graphics
-    public static final String TITLE = "Tic Tac Toe";
-    public static final Color COLOR_BG = Color.WHITE;
-    public static final Color COLOR_BG_STATUS = new Color(216, 216, 216);
-    public static final Color COLOR_CROSS = new Color(239, 105, 80);  // Red #EF6950
-    public static final Color COLOR_NOUGHT = new Color(64, 154, 225); // Blue #409AE1
-    public static final Font FONT_STATUS = new Font("OCR A Extended", Font.PLAIN, 14);
+public class GameMain {
+    private Board board;
+    private boolean isPlayerVsComputer;
+    private AILevel aiLevel;
+    private ComputerAI computerAI;
+    private JFrame frame;
+    private JButton[][] buttons;
 
-    // Define game objects
-    private Board board;         // the game board
-    private State currentState;  // the current state of the game
-    private Seed currentPlayer;  // the current player
-    private JLabel statusBar;    // for displaying status message
+    private boolean isPlayer1Turn = true;
+    private int turn = 1;
 
-    /** Constructor to setup the UI and game components */
-    public GameMain() {
-
-        // This JPanel fires MouseEvent
-        super.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {  // mouse-clicked handler
-                int mouseX = e.getX();
-                int mouseY = e.getY();
-                // Get the row and column clicked
-                int row = mouseY / Cell.SIZE;
-                int col = mouseX / Cell.SIZE;
-
-                if (currentState == State.PLAYING) {
-                    if (row >= 0 && row < Board.ROWS && col >= 0 && col < Board.COLS
-                            && board.cells[row][col].content == Seed.NO_SEED) {
-                        // Update cells[][] and return the new game state after the move
-                        currentState = board.stepGame(currentPlayer, row, col);
-
-                        if (currentPlayer == Seed.CROSS) {
-                            SoundEffect.CROSS_SOUND.play();
-                        } else {
-                            SoundEffect.NOUGH_SOUND.play();
-                        }
-
-                        if (currentState == State.CROSS_WON) {
-                            SoundEffect.CROSSWIN_SOUND.play();
-                            SoundEffect.BACKGROUND.stop();
-                            // Hentikan suara latar
-                        } else if (currentState == State.NOUGHT_WON) {
-                            SoundEffect.NOUGHWIN_SOUND.play();
-                            SoundEffect.BACKGROUND.stop();
-                            // Hentikan suara latar
-                        }else if (currentState == State.DRAW) {
-                            SoundEffect.DRAW_SOUND.play();
-                            SoundEffect.BACKGROUND.stop();
-                            // Hentikan suara latar jika permainan berakhir
-                        }
-                        // Switch player
-                        currentPlayer = (currentPlayer == Seed.CROSS) ? Seed.NOUGHT : Seed.CROSS;
-                    }
-                } else {        // game over
-                    newGame();  // restart the game
-                }
-                // Refresh the drawing canvas
-                repaint();  // Callback paintComponent().
-            }
-        });
-
-        // Setup the status bar (JLabel) to display status message
-        statusBar = new JLabel();
-        statusBar.setFont(FONT_STATUS);
-        statusBar.setBackground(COLOR_BG_STATUS);
-        statusBar.setOpaque(true);
-        statusBar.setPreferredSize(new Dimension(300, 30));
-        statusBar.setHorizontalAlignment(JLabel.LEFT);
-        statusBar.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 12));
-
-        super.setLayout(new BorderLayout());
-        super.add(statusBar, BorderLayout.PAGE_END); // same as SOUTH
-        super.setPreferredSize(new Dimension(Board.CANVAS_WIDTH, Board.CANVAS_HEIGHT + 30));
-        // account for statusBar in height
-        super.setBorder(BorderFactory.createLineBorder(COLOR_BG_STATUS, 2, false));
-
-        // Set up Game
-        initGame();
-        newGame();
-
-        SoundEffect.BACKGROUND.loop();
-    }
-
-    /** Initialize the game (run once) */
-    public void initGame() {
-        board = new Board();  // allocate the game-board
-    }
-
-    /** Reset the game-board contents and the current-state, ready for new game */
-    public void newGame() {
-        for (int row = 0; row < Board.ROWS; ++row) {
-            for (int col = 0; col < Board.COLS; ++col) {
-                board.cells[row][col].content = Seed.NO_SEED; // all cells empty
-            }
-        }
-        currentPlayer = Seed.CROSS;    // cross plays first
-        currentState = State.PLAYING;  // ready to play
-
-        SoundEffect.BACKGROUND.loop();
-    }
-
-    /** Custom painting codes on this JPanel */
-    @Override
-    public void paintComponent(Graphics g) {  // Callback via repaint()
-        super.paintComponent(g);
-        setBackground(COLOR_BG); // set its background color
-
-        board.paint(g);  // ask the game board to paint itself
-
-        // Print status-bar message
-        if (currentState == State.PLAYING) {
-            statusBar.setForeground(Color.BLACK);
-            statusBar.setText((currentPlayer == Seed.CROSS) ? "X's Turn" : "O's Turn");
-        } else if (currentState == State.DRAW) {
-            statusBar.setForeground(Color.RED);
-            statusBar.setText("It's a Draw! Click to play again.");
-        } else if (currentState == State.CROSS_WON) {
-            statusBar.setForeground(Color.RED);
-            statusBar.setText("'X' Won! Click to play again.");
-        } else if (currentState == State.NOUGHT_WON) {
-            statusBar.setForeground(Color.RED);
-            statusBar.setText("'O' Won! Click to play again.");
+    public GameMain(Board board, boolean isPlayerVsComputer, AILevel aiLevel, JFrame frame) {
+        this.board = board;
+        this.isPlayerVsComputer = isPlayerVsComputer;
+        this.aiLevel = aiLevel;
+        this.frame = frame;
+        if (isPlayerVsComputer) {
+            this.computerAI = new ComputerAI();
+            this.computerAI.setLevel(aiLevel);
         }
     }
 
-    /** The entry "main" method */
-    public static void play() {
-        // Run GUI construction codes in Event-Dispatching thread for thread safety
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                JFrame frame = new JFrame(TITLE);
-                // Set the content-pane of the JFrame to an instance of main JPanel
-                frame.setContentPane(new GameMain());
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                frame.pack();
-                frame.setLocationRelativeTo(null); // center the application window
-                frame.setVisible(true);            // show it
+    public void start() {
+        frame.getContentPane().removeAll();
+        frame.setLayout(new GridLayout(3, 3));
+        buttons = new JButton[3][3];
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                buttons[i][j] = new JButton("");
+                int row = i, col = j;
+                buttons[i][j].addActionListener(e -> handleMove(row, col));
+                frame.add(buttons[i][j]);
             }
-        });
+        }
+
+        frame.setVisible(true);
+    }
+
+    private void handleMove(int row, int col) {
+        if (!board.isValidMove(row, col)) return;
+
+        Token currentPlayerToken = isPlayer1Turn ? Token.X : Token.O;
+        board.makeMove(row, col, currentPlayerToken);
+        buttons[row][col].setText(currentPlayerToken.toString());
+
+        if (board.isWinningMove(currentPlayerToken)) {
+            JOptionPane.showMessageDialog(frame, (isPlayer1Turn ? "Player 1" : isPlayerVsComputer ? "Computer" : "Player 2") + " wins!");
+            resetGame();
+            return;
+        }
+
+        if (board.isGameOver()) {
+            JOptionPane.showMessageDialog(frame, "It's a draw!");
+            resetGame();
+            return;
+        }
+
+        isPlayer1Turn = !isPlayer1Turn;
+        turn++;
+
+        if (isPlayerVsComputer && !isPlayer1Turn) {
+            computerTurn();
+        }
+    }
+
+    private void computerTurn() {
+        Point move = computerAI.turn(board, Token.O, turn);
+        handleMove(move.x, move.y);
+    }
+
+    private void resetGame() {
+        board.reset();
+        isPlayer1Turn = true;
+        turn = 1;
+        start();
     }
 }
