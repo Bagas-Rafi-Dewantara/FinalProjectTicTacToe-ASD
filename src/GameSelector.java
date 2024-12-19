@@ -5,7 +5,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import TicTacToe.TTTGraphics;
-
+import Connect4.TTTGraphics4;
 public class GameSelector {
     private JFrame frame;
     private BufferedImage backgroundImage;
@@ -108,8 +108,11 @@ public class GameSelector {
     }
 
     private void startConnectFour() {
-        // Placeholder for ConnectFour functionality, can be implemented later
-        JOptionPane.showMessageDialog(frame, "Connect Four is not implemented yet.");
+
+        TTTGraphics4 game4 = new TTTGraphics4();
+        game4.showMenu();
+        frame.dispose();
+
     }
 
     public static void main(String[] args) {
