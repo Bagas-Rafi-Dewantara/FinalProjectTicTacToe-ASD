@@ -1,16 +1,19 @@
 package TicTacToe;
-
+import javax.imageio.ImageIO;
+import java.io.IOException;
 import javax.swing.*;
 import java.awt.*;
 
 public class TTTGraphics {
-    private JFrame frame;
+    public JFrame frame;
     private Board board;
     private Cell game;
     private String player1Name;
     private String player2Name;
     private Token player1Token;
     private Token player2Token;
+    private Image bgImage;
+    private Image bgImageAI;
 
 
     public TTTGraphics() {
@@ -18,58 +21,185 @@ public class TTTGraphics {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(600, 600);  // Ukuran frame, bisa disesuaikan
         frame.setLayout(new BorderLayout());
+
+        frame.setLocationRelativeTo(null);
+
+        try {
+            // Muat gambar background dari folder src atau path lain
+            bgImage = ImageIO.read(getClass().getResource("TTT.jpg"));  // Pastikan path sudah benar
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
+    // Kelas untuk menggambar background
+    private class BackgroundPanel extends JPanel {
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            // Gambar background
+            g.drawImage(bgImage, 0, 0, getWidth(), getHeight(), this);
+        }
+    }
+
+
+
+
     public void showMenu() {
-        JPanel panel = new JPanel(new GridLayout(3, 1));
-        JLabel label = new JLabel("Choose Game Mode:", SwingConstants.CENTER);
+        BackgroundPanel PanelTicTacToe = new BackgroundPanel();
+        PanelTicTacToe.setLayout(new GridBagLayout());  // Menggunakan GridBagLayout untuk kontrol yang lebih baik
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.insets = new Insets(20, 20, 20, 20);  // Menambahkan jarak antara elemen dan panel
+
         JButton vsHuman = new JButton("Player vs Player");
+
+
         JButton vsAI = new JButton("Player vs Computer");
 
-        label.setFont(new Font("Arial", Font.BOLD, 40));  // Ukuran font lebih besar
+        vsHuman.setFont(new Font("Times New Roman", Font.BOLD, 40));
+        vsAI.setFont(new Font("Times New Roman", Font.BOLD, 40));
+        vsHuman.setForeground(Color.white);
+        vsAI.setForeground(Color.white);
 
-        // Menetapkan font yang lebih besar untuk tombol
-        vsHuman.setFont(new Font("Arial", Font.BOLD, 40));
-        vsAI.setFont(new Font("Arial", Font.BOLD, 40));
+        vsAI.setBackground(new Color(62, 88, 121));  // Ubah warna background sesuai keinginan
+        vsHuman.setBackground(new Color(33, 53, 85));  // Ubah warna background sesuai keinginan
+
 
         vsHuman.addActionListener(e -> startGame(false, null));
         vsAI.addActionListener(e -> showAIModeMenu());
 
-        panel.add(label);
-        panel.add(vsHuman);
-        panel.add(vsAI);
+        vsHuman.setRolloverEnabled(true);
+        vsHuman.setContentAreaFilled(true);
+        vsHuman.setBorderPainted(true);
+
+        vsAI.setRolloverEnabled(true);
+        vsAI.setContentAreaFilled(true);
+        vsAI.setBorderPainted(true);
+
+        // Mengatur tombol "Tic Tac Toe"
+        gbc.gridy = 1;  // Pindahkan tombol ke baris berikutnya
+        PanelTicTacToe.add(vsHuman, gbc);
+
+        // Mengatur tombol "Connect Four"
+        gbc.gridy = 2;  // Pindahkan tombol ke baris berikutnya
+        PanelTicTacToe.add(vsAI, gbc);
+
 
         frame.getContentPane().removeAll();
-        frame.add(panel, BorderLayout.CENTER);
+        frame.add(PanelTicTacToe, BorderLayout.CENTER);
         frame.setVisible(true);
 
         // Menambahkan pengaturan lokasi agar frame muncul di tengah layar
         frame.setLocationRelativeTo(null);  // Menampilkan JFrame di tengah
+
     }
 
+    private class BackgroundPanelAI extends JPanel {
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            // Gambar background
+            g.drawImage(bgImageAI, 0, 0, getWidth(), getHeight(), this);
+        }
+    }
+
+
+
     private void showAIModeMenu() {
-        JPanel panel = new JPanel(new GridLayout(4, 1));
-        JLabel label = new JLabel("Choose AI Difficulty:", SwingConstants.CENTER);
+        JFrame frame  = new JFrame("AI");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(600, 600);  // Ukuran frame, bisa disesuaikan
+        frame.setLayout(new BorderLayout());
+
+        frame.setLocationRelativeTo(null);
+
+        try {
+            // Muat gambar background dari folder src atau path lain
+            bgImageAI = ImageIO.read(getClass().getResource("TTT.jpg"));  // Pastikan path sudah benar
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        BackgroundPanelAI PanelAI = new BackgroundPanelAI();
+        PanelAI.setLayout(new GridBagLayout());
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.insets = new Insets(20, 20, 20, 20);  // Menambahkan jarak antara elemen dan panel
+
+        JLabel label = new JLabel("         ", SwingConstants.CENTER);
         JButton easy = new JButton("Easy");
         JButton medium = new JButton("Medium");
         JButton hard = new JButton("Hard");
 
+        // Menetapkan font dan warna tombol
+        label.setFont(new Font("Times New Roman", Font.BOLD, 30));
+        easy.setFont(new Font("Times New Roman", Font.BOLD, 30));
+        medium.setFont(new Font("Times New Roman", Font.BOLD, 30));
+        hard.setFont(new Font("Times New Roman", Font.BOLD, 30));
+
+
+
+        label.setForeground(Color.white);
+        easy.setForeground(Color.WHITE);
+        medium.setForeground(Color.WHITE);
+        hard.setForeground(Color.WHITE);
+
+        label.setBackground(Color.WHITE);
+
+        easy.setBackground(new Color(33, 53, 85));
+        medium.setBackground(new Color(62, 88, 121));
+        hard.setBackground(new Color(62, 88, 121));
+
+        // Set tombol agar ada efek hover dan border rounded
+
+        easy.setRolloverEnabled(true);
+        easy.setContentAreaFilled(true);
+        easy.setBorderPainted(true);
+
+        medium.setRolloverEnabled(true);
+        medium.setContentAreaFilled(true);
+        medium.setBorderPainted(true);
+
+        hard.setRolloverEnabled(true);
+        hard.setContentAreaFilled(true);
+        hard.setBorderPainted(true);
+
+        // Menambahkan action listener untuk tombol
         easy.addActionListener(e -> startGame(true, AILevel.Easy));
         medium.addActionListener(e -> startGame(true, AILevel.Medium));
         hard.addActionListener(e -> startGame(true, AILevel.Hard));
 
-        panel.add(label);
-        panel.add(easy);
-        panel.add(medium);
-        panel.add(hard);
 
-        frame.getContentPane().removeAll();
-        frame.add(panel, BorderLayout.CENTER);
-        frame.setVisible(true);
+        // Menambahkan elemen ke panel
+        PanelAI.add(label, gbc);
+
+        gbc.gridy = 1;
+        PanelAI.add(easy, gbc);
+
+        gbc.gridy = 2;
+        PanelAI.add(medium, gbc);
+
+        gbc.gridy = 3;
+        PanelAI.add(hard, gbc);
 
         // Menambahkan pengaturan lokasi agar frame muncul di tengah layar
-        frame.setLocationRelativeTo(null);  // Menampilkan JFrame di tengah
+        frame.getContentPane().removeAll();
+        frame.add(PanelAI, BorderLayout.CENTER);
+        frame.setVisible(true);
+        frame.setLocationRelativeTo(null);
+
     }
+
+
 
     private void startGame(boolean vsAI, AILevel aiLevel) {
         // Input nama pemain
