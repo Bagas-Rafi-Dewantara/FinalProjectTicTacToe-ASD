@@ -68,7 +68,8 @@ public class TTTGraphics {
 
     private void startGame(boolean vsAI, AILevel aiLevel) {
         board = new Board();
+        String backgroundPath = "/TicTacToe/image/bc_malam.jpg"; // Ganti dengan path gambar Anda
         game = new Cell(board, vsAI, aiLevel, frame);
-        game.start();
+        game.start(backgroundPath);
     }
 }

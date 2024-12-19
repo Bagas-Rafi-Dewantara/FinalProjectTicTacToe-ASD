@@ -2,6 +2,7 @@ package TicTacToe;
 
 import javax.swing.*;
 import java.awt.*;
+import javax.swing.border.EmptyBorder;
 
 public class Cell {
     private Board board;
@@ -13,6 +14,37 @@ public class Cell {
 
     private boolean isPlayer1Turn = true;
     private int turn = 1;
+
+    private Image backgroundImage;
+    private ImageIcon xIcon; // Gambar untuk X
+    private ImageIcon oIcon; // Gambar untuk O
+
+    private void loadBackgroundImage(String imagePath) {
+        try {
+            backgroundImage = new ImageIcon(getClass().getResource(imagePath)).getImage();
+        } catch (NullPointerException e) {
+            System.err.println("Background image not found: " + imagePath);
+        }
+    }
+
+    private void loadIcons(String xImagePath, String oImagePath) {
+        try {
+            xIcon = new ImageIcon(getClass().getResource(xImagePath));
+            oIcon = new ImageIcon(getClass().getResource(oImagePath));
+        } catch (NullPointerException e) {
+            System.err.println("Icon image not found: " + xImagePath + " or " + oImagePath);
+        }
+    }
+
+    private class BackgroundPanel extends JPanel {
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            if (backgroundImage != null) {
+                g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+            }
+        }
+    }
 
     public Cell(Board board, boolean isPlayerVsComputer, AILevel aiLevel, JFrame frame) {
         this.board = board;
@@ -27,21 +59,43 @@ public class Cell {
         SoundEffect.BACKGROUND.loop();
     }
 
-    public void start() {
+    public void start(String backgroundPath) {
+        // Muat gambar latar belakang
+        loadBackgroundImage(backgroundPath);
+
+        // Muat ikon X dan O
+        loadIcons("/TicTacToe/image/cross.png", "/TicTacToe/image/nough.png");
+
+        // Hapus konten sebelumnya
         frame.getContentPane().removeAll();
-        frame.setLayout(new GridLayout(3, 3));
+
+        // Buat panel dengan latar belakang
+        BackgroundPanel panel = new BackgroundPanel();
+        panel.setLayout(new GridLayout(3, 3));
         buttons = new JButton[3][3];
 
+        // Tambahkan tombol ke panel
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 buttons[i][j] = new JButton("");
+                buttons[i][j].setFont(new Font("Arial", Font.BOLD, 40));
                 int row = i, col = j;
                 buttons[i][j].addActionListener(e -> handleMove(row, col));
-                buttons[i][j].setFont(new Font("Arial", Font.BOLD, 40));
-                frame.add(buttons[i][j]);
+
+                // Atur transparansi tombol
+                buttons[i][j].setOpaque(false);
+                buttons[i][j].setContentAreaFilled(false);
+                buttons[i][j].setBorderPainted(true);
+
+                // Tambahkan tombol ke panel
+                panel.add(buttons[i][j]);
             }
         }
 
+        // Tambahkan panel ke frame
+        frame.add(panel);
+        frame.revalidate();
+        frame.repaint();
         frame.setVisible(true);
         SoundEffect.BACKGROUND.loop();
     }
@@ -51,12 +105,13 @@ public class Cell {
 
         Token currentPlayerToken = isPlayer1Turn ? Token.X : Token.O;
         board.makeMove(row, col, currentPlayerToken);
-        buttons[row][col].setText(currentPlayerToken.toString());
 
-        //Menambahkan bunyi saat CROSS ataupun NOUGH diletakkan
+        // Gunakan ikon gambar sebagai representasi X atau O
         if (currentPlayerToken == Token.X) {
+            buttons[row][col].setIcon(xIcon);
             SoundEffect.CROSS_SOUND.play();
         } else {
+            buttons[row][col].setIcon(oIcon);
             SoundEffect.NOUGH_SOUND.play();
         }
 
@@ -98,7 +153,6 @@ public class Cell {
         board.reset();
         isPlayer1Turn = true;
         turn = 1;
-        start();
+        start("/TicTacToe/image/bc_malam.jpg");
     }
 }
-
