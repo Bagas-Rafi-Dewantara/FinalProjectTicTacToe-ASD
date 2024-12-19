@@ -7,6 +7,11 @@ public class TTTGraphics {
     private JFrame frame;
     private Board board;
     private Cell game;
+    private String player1Name;
+    private String player2Name;
+    private Token player1Token;
+    private Token player2Token;
+
 
     public TTTGraphics() {
         frame = new JFrame("Tic Tac Toe");
@@ -67,8 +72,26 @@ public class TTTGraphics {
     }
 
     private void startGame(boolean vsAI, AILevel aiLevel) {
+        // Input nama pemain
+        player1Name = JOptionPane.showInputDialog(frame, "Enter Player 1 Name:");
+        if (!vsAI) {
+            player2Name = JOptionPane.showInputDialog(frame, "Enter Player 2 Name:");
+        } else {
+            player2Name = "Computer";
+        }
+
+        // Input simbol pemain
+        Object[] options = {Token.X, Token.O};
+        player1Token = (Token) JOptionPane.showInputDialog(
+                frame, "Choose Player 1 Token:", "Token Selection",
+                JOptionPane.PLAIN_MESSAGE, null, options, Token.X
+        );
+
+        player2Token = (player1Token == Token.X) ? Token.O : Token.X;
+
         board = new Board();
-        game = new Cell(board, vsAI, aiLevel, frame);
+        game = new Cell(board, vsAI, aiLevel, frame, player1Name, player2Name, player1Token, player2Token);
         game.start();
     }
+
 }

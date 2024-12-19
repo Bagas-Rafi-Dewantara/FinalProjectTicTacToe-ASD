@@ -13,6 +13,30 @@ public class Cell {
 
     private boolean isPlayer1Turn = true;
     private int turn = 1;
+    private String player1Name;
+    private String player2Name;
+    private Token player1Token;
+    private Token player2Token;
+
+    public Cell(Board board, boolean isPlayerVsComputer, AILevel aiLevel, JFrame frame,
+                String player1Name, String player2Name, Token player1Token, Token player2Token) {
+        this.board = board;
+        this.isPlayerVsComputer = isPlayerVsComputer;
+        this.aiLevel = aiLevel;
+        this.frame = frame;
+        this.player1Name = player1Name;
+        this.player2Name = player2Name;
+        this.player1Token = player1Token;
+        this.player2Token = player2Token;
+
+        if (isPlayerVsComputer) {
+            this.computerAI = new ComputerAI();
+            this.computerAI.setLevel(aiLevel);
+        }
+
+        SoundEffect.BACKGROUND.loop();
+    }
+
 
     public Cell(Board board, boolean isPlayerVsComputer, AILevel aiLevel, JFrame frame) {
         this.board = board;
@@ -46,27 +70,47 @@ public class Cell {
         SoundEffect.BACKGROUND.loop();
     }
 
+    private void computerTurn() {
+        // Dapatkan langkah dari AI
+        Point move = computerAI.turn(board, player2Token, turn);
+
+        // Lakukan langkah untuk komputer
+        if (move != null) {
+            handleMove(move.x, move.y);
+        }
+    }
+
+
+    private void resetGame() {
+        board.reset();
+        isPlayer1Turn = true;
+        turn = 1;
+
+        // Reset tombol pada UI
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                buttons[i][j].setText("");
+            }
+        }
+        JOptionPane.showMessageDialog(frame, "Game has been reset. Let's play again!");
+    }
+
+
     private void handleMove(int row, int col) {
         if (!board.isValidMove(row, col)) return;
 
-        Token currentPlayerToken = isPlayer1Turn ? Token.X : Token.O;
+        Token currentPlayerToken = isPlayer1Turn ? player1Token : player2Token;
         board.makeMove(row, col, currentPlayerToken);
         buttons[row][col].setText(currentPlayerToken.toString());
 
-        //Menambahkan bunyi saat CROSS ataupun NOUGH diletakkan
-        if (currentPlayerToken == Token.X) {
+        if (currentPlayerToken == player1Token) {
             SoundEffect.CROSS_SOUND.play();
         } else {
             SoundEffect.NOUGH_SOUND.play();
         }
 
         if (board.isWinningMove(currentPlayerToken)) {
-            String winner = isPlayer1Turn ? "Player 1" : isPlayerVsComputer ? "Computer" : "Player 2";
-            if (currentPlayerToken == Token.X) {
-                SoundEffect.CROSSWIN_SOUND.play();
-            } else {
-                SoundEffect.NOUGHWIN_SOUND.play();
-            }
+            String winner = isPlayer1Turn ? player1Name : player2Name;
             JOptionPane.showMessageDialog(frame, winner + " wins!");
             SoundEffect.BACKGROUND.stop();
             resetGame();
@@ -74,7 +118,6 @@ public class Cell {
         }
 
         if (board.isGameOver()) {
-            SoundEffect.DRAW_SOUND.play();
             JOptionPane.showMessageDialog(frame, "It's a draw!");
             SoundEffect.BACKGROUND.stop();
             resetGame();
@@ -82,23 +125,13 @@ public class Cell {
         }
 
         isPlayer1Turn = !isPlayer1Turn;
-        turn++;
 
         if (isPlayerVsComputer && !isPlayer1Turn) {
             computerTurn();
         }
     }
 
-    private void computerTurn() {
-        Point move = computerAI.turn(board, Token.O, turn);
-        handleMove(move.x, move.y);
-    }
 
-    private void resetGame() {
-        board.reset();
-        isPlayer1Turn = true;
-        turn = 1;
-        start();
-    }
+
 }
 
