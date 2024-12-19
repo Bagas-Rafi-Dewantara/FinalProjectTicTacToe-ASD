@@ -26,7 +26,7 @@ public class TTTGraphics {
 
         try {
             // Muat gambar background dari folder src atau path lain
-            bgImage = ImageIO.read(getClass().getResource("TTT.jpg"));  // Pastikan path sudah benar
+            bgImage = ImageIO.read(getClass().getResource("image/TTT.jpg"));  // Pastikan path sudah benar
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -96,7 +96,7 @@ public class TTTGraphics {
 
         try {
             // Muat gambar background dari folder src atau path lain
-            bgImageAI = ImageIO.read(getClass().getResource("TTT.jpg"));  // Pastikan path sudah benar
+            bgImageAI = ImageIO.read(getClass().getResource("image/level.jpg"));  // Pastikan path sudah benar
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -110,7 +110,7 @@ public class TTTGraphics {
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.insets = new Insets(20, 20, 20, 20);  // Menambahkan jarak antara elemen dan panel
 
-        JLabel label = new JLabel("Choose AI Difficulty:", SwingConstants.CENTER);
+        JLabel label = new JLabel("              ", SwingConstants.CENTER);
         JButton easy = new JButton("Easy");
         JButton medium = new JButton("Medium");
         JButton hard = new JButton("Hard");

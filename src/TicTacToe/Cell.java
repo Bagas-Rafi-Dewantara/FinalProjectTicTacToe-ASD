@@ -52,8 +52,11 @@ public class Cell {
 
     private void loadIcons(String xImagePath, String oImagePath) {
         try {
-            xIcon = new ImageIcon(getClass().getResource(xImagePath));
-            oIcon = new ImageIcon(getClass().getResource(oImagePath));
+            // Ubah ukuran ikon agar lebih kecil
+            Image xImage = new ImageIcon(getClass().getResource(xImagePath)).getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+            Image oImage = new ImageIcon(getClass().getResource(oImagePath)).getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+            xIcon = new ImageIcon(xImage);
+            oIcon = new ImageIcon(oImage);
         } catch (NullPointerException e) {
             System.err.println("Icon image not found: " + xImagePath + " or " + oImagePath);
         }
@@ -81,7 +84,7 @@ public class Cell {
 
         // Buat panel dengan latar belakang
         BackgroundPanel panel = new BackgroundPanel();
-        panel.setLayout(new GridLayout(3, 3));
+        panel.setLayout(new GridLayout(3, 3, 5, 5)); // Tambahkan jarak antar grid
         buttons = new JButton[3][3];
 
         // Tambahkan tombol ke panel
@@ -89,12 +92,14 @@ public class Cell {
             for (int j = 0; j < 3; j++) {
                 buttons[i][j] = new JButton("");
                 buttons[i][j].setFont(new Font("Arial", Font.BOLD, 40));
-                buttons[i][j].setBorder(new EmptyBorder(10, 10, 10, 10)); // Tambahkan padding
+                buttons[i][j].setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+
+                buttons[i][j].setBackground(new Color(255, 255, 255, 50));
+                buttons[i][j].setOpaque(true);
                 int row = i, col = j;
                 buttons[i][j].addActionListener(e -> handleMove(row, col));
 
                 // Atur transparansi tombol
-                buttons[i][j].setOpaque(false);
                 buttons[i][j].setContentAreaFilled(false);
                 buttons[i][j].setBorderPainted(true);
 
