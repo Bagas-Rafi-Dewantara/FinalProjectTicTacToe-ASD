@@ -1,53 +1,104 @@
 package TicTacToe;
 
+import javax.swing.*;
 import java.awt.*;
-/**
- * The Cell class models each individual cell of the game board.
- */
+
 public class Cell {
-    // Define named constants for drawing
-    public static final int SIZE = 120; // cell width/height (square)
-    // Symbols (cross/nought) are displayed inside a cell, with padding from border
-    public static final int PADDING = SIZE / 5;
-    public static final int SEED_SIZE = SIZE - PADDING * 2;
-    public static final int SEED_STROKE_WIDTH = 8; // pen's stroke width
+    private Board board;
+    private boolean isPlayerVsComputer;
+    private AILevel aiLevel;
+    private ComputerAI computerAI;
+    private JFrame frame;
+    private JButton[][] buttons;
 
-    // Define properties (package-visible)
-    /** Content of this cell (Seed.EMPTY, Seed.CROSS, or Seed.NOUGHT) */
-    Seed content;
-    /** Row and column of this cell */
-    int row, col;
+    private boolean isPlayer1Turn = true;
+    private int turn = 1;
 
-    /** Constructor to initialize this cell with the specified row and col */
-    public Cell(int row, int col) {
-        this.row = row;
-        this.col = col;
-        content = Seed.NO_SEED;
+    public Cell(Board board, boolean isPlayerVsComputer, AILevel aiLevel, JFrame frame) {
+        this.board = board;
+        this.isPlayerVsComputer = isPlayerVsComputer;
+        this.aiLevel = aiLevel;
+        this.frame = frame;
+        if (isPlayerVsComputer) {
+            this.computerAI = new ComputerAI();
+            this.computerAI.setLevel(aiLevel);
+        }
+
+        SoundEffect.BACKGROUND.loop();
     }
 
-    /** Reset this cell's content to EMPTY, ready for new game */
-    public void newGame() {
-        content = Seed.NO_SEED;
+    public void start() {
+        frame.getContentPane().removeAll();
+        frame.setLayout(new GridLayout(3, 3));
+        buttons = new JButton[3][3];
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                buttons[i][j] = new JButton("");
+                int row = i, col = j;
+                buttons[i][j].addActionListener(e -> handleMove(row, col));
+                buttons[i][j].setFont(new Font("Arial", Font.BOLD, 40));
+                frame.add(buttons[i][j]);
+            }
+        }
+
+        frame.setVisible(true);
+        SoundEffect.BACKGROUND.loop();
     }
 
-    /** Paint itself on the graphics canvas, given the Graphics context */
-    public void paint(Graphics g) {
-        // Use Graphics2D which allows us to set the pen's stroke
-        Graphics2D g2d = (Graphics2D)g;
-        g2d.setStroke(new BasicStroke(SEED_STROKE_WIDTH,
-                BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-        // Draw the Seed if it is not empty
-        int x1 = col * SIZE + PADDING;
-        int y1 = row * SIZE + PADDING;
-        if (content == Seed.CROSS) {
-//            g2d.setColor(GameMain.COLOR_CROSS);  // draw a 2-line cross
-            int x2 = (col + 1) * SIZE - PADDING;
-            int y2 = (row + 1) * SIZE - PADDING;
-            g2d.drawLine(x1, y1, x2, y2);
-            g2d.drawLine(x2, y1, x1, y2);
-        } else if (content == Seed.NOUGHT) {  // draw a circle
-//            g2d.setColor(GameMain.COLOR_NOUGHT);
-            g2d.drawOval(x1, y1, SEED_SIZE, SEED_SIZE);
+    private void handleMove(int row, int col) {
+        if (!board.isValidMove(row, col)) return;
+
+        Token currentPlayerToken = isPlayer1Turn ? Token.X : Token.O;
+        board.makeMove(row, col, currentPlayerToken);
+        buttons[row][col].setText(currentPlayerToken.toString());
+
+        //Menambahkan bunyi saat CROSS ataupun NOUGH diletakkan
+        if (currentPlayerToken == Token.X) {
+            SoundEffect.CROSS_SOUND.play();
+        } else {
+            SoundEffect.NOUGH_SOUND.play();
+        }
+
+        if (board.isWinningMove(currentPlayerToken)) {
+            String winner = isPlayer1Turn ? "Player 1" : isPlayerVsComputer ? "Computer" : "Player 2";
+            if (currentPlayerToken == Token.X) {
+                SoundEffect.CROSSWIN_SOUND.play();
+            } else {
+                SoundEffect.NOUGHWIN_SOUND.play();
+            }
+            JOptionPane.showMessageDialog(frame, winner + " wins!");
+            SoundEffect.BACKGROUND.stop();
+            resetGame();
+            return;
+        }
+
+        if (board.isGameOver()) {
+            SoundEffect.DRAW_SOUND.play();
+            JOptionPane.showMessageDialog(frame, "It's a draw!");
+            SoundEffect.BACKGROUND.stop();
+            resetGame();
+            return;
+        }
+
+        isPlayer1Turn = !isPlayer1Turn;
+        turn++;
+
+        if (isPlayerVsComputer && !isPlayer1Turn) {
+            computerTurn();
         }
     }
+
+    private void computerTurn() {
+        Point move = computerAI.turn(board, Token.O, turn);
+        handleMove(move.x, move.y);
+    }
+
+    private void resetGame() {
+        board.reset();
+        isPlayer1Turn = true;
+        turn = 1;
+        start();
+    }
 }
+
