@@ -1,24 +1,17 @@
-/**
- * ES234317-Algorithm and Data Structures
- * Semester Ganjil, 2024/2025
- * Group Capstone Project
- * Group #11
- * 1 - 5026231018 - Izzuddin Hamadi Faiz
- * 2 - 5026231091 - Bagas Rafi Dewantara
- * 3 - 5026231116 - I Putu Febryan Khrisyantara
- */
-
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import javax.sound.sampled.*;
 import TicTacToe.TTTGraphics;
 import Connect4.TTTGraphics4;
+
 public class GameSelector {
     private JFrame frame;
     private BufferedImage backgroundImage;
+    private Clip clip;
 
     public GameSelector() {
         // Membuat JFrame
@@ -26,13 +19,22 @@ public class GameSelector {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(600, 400);  // Memperbesar ukuran frame
         frame.setLayout(new BorderLayout());
-
         frame.setLocationRelativeTo(null);
 
         try {
             // Muat gambar background dari folder src atau path lain
             backgroundImage = ImageIO.read(getClass().getResource("lollziee.jpg"));  // Pastikan path sudah benar
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Muat dan putar lagu
+        try {
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File("src/intro.wav").getAbsoluteFile());
+            clip = AudioSystem.getClip();
+            clip.open(audioInputStream);
+            clip.loop(Clip.LOOP_CONTINUOUSLY);  // Putar lagu secara terus menerus
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -72,14 +74,8 @@ public class GameSelector {
         connectFourButton.setFont(new Font("Times New Roman", Font.BOLD, 30));
         ticTacToeButton.setForeground(Color.white);
         connectFourButton.setForeground(Color.white);
-
-
-
         ticTacToeButton.setBackground(new Color(62, 88, 121));  // Ubah warna background sesuai keinginan
         connectFourButton.setBackground(new Color(33, 53, 85));  // Ubah warna background sesuai keinginan
-
-
-
 
         // Menambahkan listener untuk tombol
         ticTacToeButton.addActionListener(e -> startTicTacToe());
@@ -89,7 +85,6 @@ public class GameSelector {
         ticTacToeButton.setRolloverEnabled(true);
         ticTacToeButton.setContentAreaFilled(true);
         ticTacToeButton.setBorderPainted(true);
-
         connectFourButton.setRolloverEnabled(true);
         connectFourButton.setContentAreaFilled(true);
         connectFourButton.setBorderPainted(true);
@@ -115,14 +110,20 @@ public class GameSelector {
         TTTGraphics gameUI = new TTTGraphics();
         gameUI.showMenu(); // This will open TicTacToe options
         frame.dispose(); // Close the GameSelector window
+        stopMusic(); // Hentikan musik
     }
 
     private void startConnectFour() {
-
         TTTGraphics4 game4 = new TTTGraphics4();
         game4.showMenu();
-        frame.dispose();
+        frame.dispose(); // Close the GameSelector window
+        stopMusic(); // Hentikan musik
+    }
 
+    private void stopMusic() {
+        if (clip != null && clip.isRunning()) {
+            clip.stop();
+        }
     }
 
     public static void main(String[] args) {
