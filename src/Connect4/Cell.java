@@ -144,14 +144,31 @@ public class Cell {
         buttons[row][col].setIcon(currentPlayerToken == Token.X ? xIcon : oIcon);
         buttons[row][col].setEnabled(false); // Disable tombol yang terisi
 
+        if (currentPlayerToken == Token.X) {
+            SoundEffect.CROSS_SOUND.play(); // Suara untuk X
+        } else {
+            SoundEffect.NOUGH_SOUND.play(); // Suara untuk O
+        }
+
         if (board.isWinningMove(currentPlayerToken, row, col)) {
             String winner = isPlayer1Turn ? player1Name : player2Name;
+            // MODIFIKASI: Mainkan suara berdasarkan token pemain yang menang
+            if (currentPlayerToken == Token.X) {
+                SoundEffect.CROSSWIN_SOUND.play();
+                SoundEffect.BACKGROUND.stop();
+            } else {
+                SoundEffect.NOUGHWIN_SOUND.play();
+                SoundEffect.BACKGROUND.stop();
+            }
             JOptionPane.showMessageDialog(frame, winner + " wins!");
+
             resetGame();
             return;
         }
 
+
         if (board.isGameOver()) {
+            SoundEffect.DRAW_SOUND.play();
             JOptionPane.showMessageDialog(frame, "It's a draw!");
             resetGame();
             return;
@@ -173,5 +190,6 @@ public class Cell {
         }
         JOptionPane.showMessageDialog(frame, "Game has been reset. Let's play again!");
 
+        SoundEffect.BACKGROUND.loop();
     }
 }

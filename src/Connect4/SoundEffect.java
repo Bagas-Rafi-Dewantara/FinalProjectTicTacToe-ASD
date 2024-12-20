@@ -8,12 +8,12 @@ import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 public enum SoundEffect {
-    BACKGROUND("TicTacToe/audio/game_music.wav"),
-    CROSS_SOUND("TicTacToe/audio/cross_placed.wav"),
-    NOUGH_SOUND("TicTacToe/audio/nough_placed.wav"),
-    CROSSWIN_SOUND ("TicTacToe/audio/cross_win.wav"),
-    NOUGHWIN_SOUND("TicTacToe/audio/nough_win.wav"),
-    DRAW_SOUND("TicTacToe/audio/draw.wav");
+    BACKGROUND("Connect4/audio/game_music.wav"),
+    CROSS_SOUND("Connect4/audio/cross_placed.wav"),
+    NOUGH_SOUND("Connect4/audio/nough_placed.wav"),
+    CROSSWIN_SOUND ("Connect4/audio/cross_win.wav"),
+    NOUGHWIN_SOUND("Connect4/audio/nough_win.wav"),
+    DRAW_SOUND("Connect4/audio/draw.wav");
 
     /** Nested enumeration for specifying volume */
     public static enum Volume {
