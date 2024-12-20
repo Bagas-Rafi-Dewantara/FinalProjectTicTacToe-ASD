@@ -9,12 +9,12 @@ public class TTTGraphics4 {
     public JFrame frame;
     private Board board;
     private Cell game;
+    private ComputerAI ai; // Add AI instance
     private String player1Name;
     private String player2Name;
     private Token player1Token;
     private Token player2Token;
     private Image bgImage3;
-
 
     public TTTGraphics4() {
         frame = new JFrame("Connect Four");
@@ -33,7 +33,6 @@ public class TTTGraphics4 {
         }
     }
 
-
     private class BackgroundPanel extends JPanel {
         @Override
         protected void paintComponent(Graphics g) {
@@ -43,10 +42,8 @@ public class TTTGraphics4 {
         }
     }
 
-
     public void showMenu() {
         BackgroundPanel C4Panel = new BackgroundPanel();
-        //C4Panel.setOpaque(false);
         C4Panel.setLayout(new GridBagLayout()); // Menggunakan GridBagLayout untuk kontrol tata letak yang fleksibel
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -81,7 +78,6 @@ public class TTTGraphics4 {
         frame.setLocationRelativeTo(null);
     }
 
-
     private void startGame(boolean vsAI) {
         // Input nama pemain
         player1Name = JOptionPane.showInputDialog(frame, "Enter Player 1 Name:");
@@ -89,6 +85,7 @@ public class TTTGraphics4 {
             player2Name = JOptionPane.showInputDialog(frame, "Enter Player 2 Name:");
         } else {
             player2Name = "Computer";
+            ai = new ComputerAI(); // Initialize AI if playing against computer
         }
 
         // Input simbol pemain
@@ -102,8 +99,7 @@ public class TTTGraphics4 {
 
         // Membuat dan memulai game
         board = new Board();
-        game = new Cell(board, vsAI, frame, player1Name, player2Name, player1Token, player2Token);
+        game = new Cell(board, vsAI, frame, player1Name, player2Name, player1Token, player2Token, ai);
         game.start("/Connect4/image/bc_malam.jpg");
     }
-
 }

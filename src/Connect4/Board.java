@@ -32,6 +32,7 @@ public class Board {
         return -1; // Jika kolom penuh
     }
 
+
     public boolean isWinningMove(Token token, int row, int col) {
         return checkDirection(token, row, col, 1, 0) // Horizontal
                 || checkDirection(token, row, col, 0, 1) // Vertikal

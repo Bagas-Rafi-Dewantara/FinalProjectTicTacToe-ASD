@@ -5,154 +5,78 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class ComputerAI {
+
     private Random r;
 
     public ComputerAI() {
-        this.r = new Random(); // Inisialisasi random untuk AI
+        this.r = new Random(); // Initialize random for AI
     }
 
-    public Point turn(Board b, Token t, int turn) {
-        // Langsung gunakan logika "hard" sebagai default
-        return this.hard(b, t, turn);
-    }
-
-    private Point hard(Board b, Token t, int turn) {
-        Point p = win(b, t);
+    public Point turn(Board b, Token t) {
+        Point p = win(b, t); // Try to win
 
         if (p == null) {
-            p = blockWin(b, t);
-        }
-
-        if (turn % 2 == 0) {
-            if (p == null && turn == 4) {
-                p = this.defenceDiagnalAttack(b, t);
-            }
-
-            if (p == null && turn == 4) {
-                p = defenceCornerChooser(b, t);
-            }
-
-            if (p == null) {
-                p = defenceMoves(b, t);
-            }
-        } else {
-            if (p == null) {
-                p = this.chooseRandomCorner(b, t);
-            }
+            p = blockWin(b, t); // Block opponent's winning move
         }
 
         if (p == null) {
-            p = this.random(b, t);
+            p = chooseStrategicMove(b, t); // Choose strategic move
         }
-        System.out.println("Hard mode AI move: " + p.x + "," + p.y);
+
+        if (p == null) {
+            p = random(b, t); // Random move as fallback
+        }
+
+        System.out.println("AI move: " + p.x + "," + p.y);
         return p;
     }
-    private boolean equalsOpponent(Connect4.Token boardToken, Connect4.Token t){
-        return boardToken != t && boardToken != Connect4.Token.Empty;
+
+    private Point win(Board b, Token t) {
+        // Implement the logic to identify winning moves for Connect Four
+        return null; // Placeholder for actual implementation
     }
 
-    private Point defenceDiagnalAttack(Connect4.Board b, Connect4.Token t){
-        if(this.equalsOpponent(b.getCellType(0, 0), t) && this.equalsOpponent(b.getCellType(2, 2), t) ||
-                this.equalsOpponent(b.getCellType(0, 2), t) && this.equalsOpponent(b.getCellType(2, 0), t)) {
-            ArrayList<Point> options = new ArrayList<>();
-            for(int k = -1; k < 2; k += 2){
-                if(1 + k >= 0 && 1 + k < 3) {
-                    if(b.getCellType(1, 1 + k) == Connect4.Token.Empty){
-                        options.add(new Point(1, 1 + k));
-                    }
+    private Point blockWin(Board b, Token t) {
+        // Implement the logic to block opponent's winning moves for Connect Four
+        return null; // Placeholder for actual implementation
+    }
 
-                    if(b.getCellType(1 + k, 1) == Connect4.Token.Empty){
-                        options.add(new Point(1 + k, 1));
-                    }
-                }
-            }
-
-            if(!options.isEmpty()) {
-                return options.get(this.r.nextInt(options.size()));
+    private Point chooseStrategicMove(Board b, Token t) {
+        // AI will try to take the center column if available
+        int centerColumn = b.COLS / 2;
+        for (int i = b.ROWS - 1; i >= 0; i--) {
+            if (b.getCellType(i, centerColumn) == Token.Empty) {
+                return new Point(i, centerColumn);
             }
         }
-        return null;
+        // If center is not available, pick a random column
+        return chooseRandomColumn(b, t);
     }
 
-    private Point defenceCornerChooser(Connect4.Board b, Connect4.Token t){
+    private Point chooseRandomColumn(Board b, Token t) {
         ArrayList<Point> options = new ArrayList<>();
-        int sum;
-        for(int i = 0; i < 3; i += 2){
-            for(int j = 0; j < 3; j += 2){
-                sum = 0;
-                if(b.getCellType(i, j) == Connect4.Token.Empty){
-                    for(int k = -1; k < 2; k += 2){
-                        if(j + k >= 0 && j + k < 3) {
-                            if(b.getCellType(i, j + k) == t){
-                                sum--;
-                            } else if(b.getCellType(i, j + k) != Connect4.Token.Empty){
-                                sum++;
-                            }
-                        }
-                    }
-
-                    for(int k = -1; k < 2; k += 2){
-                        if(i + k >= 0 && i + k < 3) {
-                            if(b.getCellType(i + k, j) == t){
-                                sum--;
-                            } else if(b.getCellType(i + k, j) != Connect4.Token.Empty){
-                                sum++;
-                            }
-                        }
-                    }
-                    if(sum == 2){
-                        options.add(new Point(i, j));
-                    }
+        for (int j = 0; j < 7; j++) {
+            for (int i = 0; i < 6; i++) {
+                if (b.getCellType(i, j) == Token.Empty) {
+                    options.add(new Point(i, j));
+                    break; // Only consider the lowest empty spot in the column
                 }
             }
         }
 
-        if(!options.isEmpty()) {
+        if (!options.isEmpty()) {
             return options.get(this.r.nextInt(options.size()));
         }
         return null;
     }
 
-    private Point defenceMoves(Connect4.Board b, Connect4.Token t){
-        if(b.getCellType(1, 1) == Connect4.Token.Empty){
-            return new Point(1, 1);
-        } else {
-            return this.chooseRandomCorner(b, t);
-        }
-    }
-
-    private Point chooseRandomCorner(Connect4.Board b, Connect4.Token t){
+    private Point random(Board b, Token t) {
         ArrayList<Point> options = new ArrayList<>();
-        for(int i = 0; i < 3; i += 2){
-            for(int j = 0; j < 3; j += 2){
-                if(b.getCellType(i, j) == Connect4.Token.Empty){
+        for (int j = 0; j < 7; j++) {
+            for (int i = 0; i < 6; i++) {
+                if (b.getCellType(i, j) == Token.Empty) {
                     options.add(new Point(i, j));
-                }
-            }
-        }
-
-        if(!options.isEmpty()) {
-            return options.get(this.r.nextInt(options.size()));
-        }
-        return null;
-    }
-
-    private Point win(Connect4.Board b, Connect4.Token t){
-        // Logic remains the same, using b.getCellType instead of c.getType()
-        return null; // Placeholder for actual implementation
-    }
-
-    Point blockWin(Connect4.Board b, Connect4.Token t) {
-        // Logic remains the same, using b.getCellType instead of c.getType()
-        return null; // Placeholder for actual implementation
-    }
-
-    Point random(Connect4.Board b, Connect4.Token t) {
-        ArrayList<Point> options = new ArrayList<>();
-        for(int i = 0; i < 3; i++){
-            for(int j = 0; j < 3; j++){
-                if(b.getCellType(i, j) == Connect4.Token.Empty){
-                    options.add(new Point(i, j));
+                    break; // Only consider the lowest empty spot in the column
                 }
             }
         }
@@ -160,5 +84,7 @@ public class ComputerAI {
         return options.get(this.r.nextInt(options.size()));
     }
 
-    // Semua metode pendukung lainnya tetap sama
+    private Token getOpponent(Token t) {
+        return t == Token.X ? Token.O : Token.X;
+    }
 }
