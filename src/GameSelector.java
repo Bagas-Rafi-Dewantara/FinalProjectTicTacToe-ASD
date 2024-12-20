@@ -40,7 +40,7 @@ public class GameSelector {
 
         // Muat dan putar lagu
         try {
-            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File("FinalProjectTicTacToe-ASD/src/intro.wav").getAbsoluteFile());
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File("src/intro.wav").getAbsoluteFile());
             clip = AudioSystem.getClip();
             clip.open(audioInputStream);
             clip.loop(Clip.LOOP_CONTINUOUSLY);  // Putar lagu secara terus menerus
