@@ -250,8 +250,26 @@ public class Cell {
     }
 
     private void makeAIMove() {
-        Point aiMove = computerAI.turn(board, player2Token);
-        handleMove(aiMove.y); // Call handleMove with the AI's column choice
+        new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                try {
+                    Thread.sleep(1000); // Jeda 1 detik (1000 ms) sebelum komputer membuat langkah
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                // Setelah jeda, komputer membuat langkah
+                Point aiMove = computerAI.turn(board, player2Token);
+                if (aiMove != null) {
+                    handleMove(aiMove.y); // Langkah komputer
+                }
+            }
+        }.execute();
     }
 
     private void resetGame() {

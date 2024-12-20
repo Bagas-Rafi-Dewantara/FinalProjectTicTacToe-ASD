@@ -244,13 +244,27 @@ public class Cell {
     }
 
     private void computerTurn() {
-        // Dapatkan langkah dari AI
-        Point move = computerAI.turn(board, player2Token, turn);
+        // Gunakan SwingWorker untuk menjalankan logika di thread terpisah
+        new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                try {
+                    Thread.sleep(1000); // Berikan jeda 1 detik (1000 ms)
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
 
-        // Lakukan langkah untuk komputer
-        if (move != null) {
-            handleMove(move.x, move.y);
-        }
+            @Override
+            protected void done() {
+                // Setelah jeda, lakukan langkah AI
+                Point move = computerAI.turn(board, player2Token, turn);
+                if (move != null) {
+                    handleMove(move.x, move.y);
+                }
+            }
+        }.execute();
     }
 
     private void resetGame() {
