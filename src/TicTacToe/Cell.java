@@ -204,11 +204,14 @@ public class Cell {
             String winner = isPlayer1Turn ? player1Name : player2Name;
             if (isPlayer1Turn) {
                 player1Points++; // Tambahkan poin untuk pemain 1
+                SoundEffect.CROSSWIN_SOUND.play();
+                SoundEffect.BACKGROUND.stop();
             } else {
                 player2Points++; // Tambahkan poin untuk pemain 2
+                SoundEffect.NOUGHWIN_SOUND.play();
+                SoundEffect.BACKGROUND.stop();
             }
             JOptionPane.showMessageDialog(frame, winner + " wins!");
-            SoundEffect.BACKGROUND.stop();
             totalGames++; // Tambahkan jumlah permainan
             resetBoard();
             return;
@@ -217,6 +220,7 @@ public class Cell {
         if (board.isGameOver()) {
             JOptionPane.showMessageDialog(frame, "It's a draw!");
             SoundEffect.DRAW_SOUND.play();
+            SoundEffect.BACKGROUND.stop();
             totalGames++; // Tambahkan jumlah permainan
             resetBoard();
             return;
@@ -289,9 +293,6 @@ public class Cell {
         }
         // Update tampilan skor
         pointsLabel.setText(getPointsText());
+        SoundEffect.BACKGROUND.loop();
     }
-
-
-
-
 }

@@ -86,7 +86,7 @@ public class Cell {
         loadBackgroundImage(backgroundPath);
 
         // Muat ikon X dan O
-        loadIcons("/Connect4/image/cross.png", "/Connect4/image/nough.png");
+        loadIcons("/Connect4/image/crossc4.png", "/Connect4/image/noughc4.png");
 
         // Bersihkan semua komponen sebelumnya
         frame.getContentPane().removeAll();
