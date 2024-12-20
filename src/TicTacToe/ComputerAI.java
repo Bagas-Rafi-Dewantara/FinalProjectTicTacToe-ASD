@@ -30,86 +30,145 @@ public class ComputerAI {
         return p;
     }
 
-    private Point easy(Board b, Token t, int turn){
-        Point p = win(b, t);
+    private Point easy(Board b, Token t, int turn) {
+        Point p = win(b, t); // Coba menang
 
-        if(p == null){
-            p = blockWin(b, t);
+        if (p == null) {
+            p = blockWin(b, t); // Blokir kemenangan lawan
         }
 
-        if(p == null){
-            p = this.random(b, t);
+        if (p == null) {
+            p = findClosestEmpty(b); // Cari ruang kosong terdekat
         }
+
         System.out.println("Easy mode selected, AI move: " + p.x + "," + p.y);
         return p;
     }
 
-    private Point medium(Board b, Token t, int turn){
-        Point p = win(b, t);
-
-        if(p == null){
-            p = blockWin(b, t);
-        }
-
-        int choice = r.nextInt(2);
-        if(choice == 1){
-            if(turn % 2 == 0) {
-                if(p == null && turn == 4){
-                    p = this.defenceDiagnalAttack(b, t);
-                }
-
-                if(p == null && turn == 4){
-                    p = defenceCornerChooser(b, t);
-                }
-
-                if(p == null){
-                    p = defenceMoves(b, t);
-                }
-            } else {
-                if(p == null){
-                    p = this.chooseRandomCorner(b, t);
+    // Tambahkan metode untuk mencari ruang kosong terdekat
+    private Point findClosestEmpty(Board b) {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (b.getCellType(i, j) == Token.Empty) {
+                    return new Point(i, j); // Pilih kotak kosong pertama yang ditemukan
                 }
             }
         }
+        return null; // Tidak ada ruang kosong
+    }
 
-        if(p == null){
-            p = this.random(b, t);
+    private Point medium(Board b, Token t, int turn) {
+        Point p = win(b, t); // Coba menang
+
+        if (p == null) {
+            p = blockWin(b, t); // Blokir kemenangan lawan
         }
+
+        if (p == null) {
+            p = defenceDiagnalAttack(b, t); // Serangan diagonal
+        }
+
+        if (p == null) {
+            p = chooseStrategicMove(b, t); // Pilih langkah strategis
+        }
+
+        if (p == null) {
+            p = random(b, t); // Langkah acak jika tidak ada pilihan lain
+        }
+
         System.out.println("Medium mode selected, AI move: " + p.x + "," + p.y);
         return p;
     }
 
-    private Point hard(Board b, Token t, int turn){
-        Point p = win(b, t);
-
-        if(p == null){
-            p = blockWin(b, t);
+    // Metode untuk langkah strategis di Medium Mode
+    private Point chooseStrategicMove(Board b, Token t) {
+        // AI akan mencoba mengambil tengah jika kosong
+        if (b.getCellType(1, 1) == Token.Empty) {
+            return new Point(1, 1);
         }
 
-        if(turn % 2 == 0) {
-            if(p == null && turn == 4){
-                p = this.defenceDiagnalAttack(b, t);
-            }
+        // Jika tengah tidak tersedia, pilih sudut
+        return chooseRandomCorner(b, t);
+    }
 
-            if(p == null && turn == 4){
-                p = defenceCornerChooser(b, t);
-            }
 
-            if(p == null){
-                p = defenceMoves(b, t);
-            }
-        } else {
-            if(p == null){
-                p = this.chooseRandomCorner(b, t);
-            }
+    private Point hard(Board b, Token t, int turn) {
+        Point p = win(b, t); // Prioritas menang
+
+        if (p == null) {
+            p = blockWin(b, t); // Blokir kemenangan lawan
         }
 
-        if(p == null){
-            p = this.random(b, t);
+        if (p == null) {
+            p = minimaxMove(b, t, true); // Pilih langkah terbaik menggunakan Minimax
         }
+
+        if (p == null) {
+            p = random(b, t); // Langkah acak sebagai fallback
+        }
+
         System.out.println("Hard mode selected, AI move: " + p.x + "," + p.y);
         return p;
     }
+
+    // Implementasi Minimax untuk Hard Mode
+    private Point minimaxMove(Board b, Token t, boolean isMaximizing) {
+        int bestScore = isMaximizing ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+        Point bestMove = null;
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (b.getCellType(i, j) == Token.Empty) {
+                    b.makeMove(i, j, isMaximizing ? t : getOpponent(t)); // Simulasi langkah
+
+                    int score = minimax(b, t, 0, !isMaximizing); // Hitung skor langkah ini
+
+                    b.makeMove(i, j, Token.Empty); // Batalkan simulasi langkah
+
+                    // Pilih langkah terbaik berdasarkan skor
+                    if (isMaximizing ? score > bestScore : score < bestScore) {
+                        bestScore = score;
+                        bestMove = new Point(i, j);
+                    }
+                }
+            }
+        }
+        return bestMove;
+    }
+
+    private int minimax(Board b, Token t, int depth, boolean isMaximizing) {
+        if (b.isWinningMove(t)) {
+            return 10 - depth; // Semakin cepat menang, semakin baik
+        }
+        if (b.isWinningMove(getOpponent(t))) {
+            return depth - 10; // Semakin cepat kalah, semakin buruk
+        }
+        if (b.isGameOver()) {
+            return 0; // Seri
+        }
+
+        int bestScore = isMaximizing ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (b.getCellType(i, j) == Token.Empty) {
+                    b.makeMove(i, j, isMaximizing ? t : getOpponent(t));
+
+                    int score = minimax(b, t, depth + 1, !isMaximizing);
+
+                    b.makeMove(i, j, Token.Empty);
+
+                    bestScore = isMaximizing ? Math.max(score, bestScore) : Math.min(score, bestScore);
+                }
+            }
+        }
+        return bestScore;
+    }
+
+    private Token getOpponent(Token t) {
+        return t == Token.X ? Token.O : Token.X;
+    }
+
 
     private boolean equalsOpponent(Token boardToken, Token t){
         return boardToken != t && boardToken != Token.Empty;
@@ -138,52 +197,6 @@ public class ComputerAI {
         return null;
     }
 
-    private Point defenceCornerChooser(Board b, Token t){
-        ArrayList<Point> options = new ArrayList<>();
-        int sum;
-        for(int i = 0; i < 3; i += 2){
-            for(int j = 0; j < 3; j += 2){
-                sum = 0;
-                if(b.getCellType(i, j) == Token.Empty){
-                    for(int k = -1; k < 2; k += 2){
-                        if(j + k >= 0 && j + k < 3) {
-                            if(b.getCellType(i, j + k) == t){
-                                sum--;
-                            } else if(b.getCellType(i, j + k) != Token.Empty){
-                                sum++;
-                            }
-                        }
-                    }
-
-                    for(int k = -1; k < 2; k += 2){
-                        if(i + k >= 0 && i + k < 3) {
-                            if(b.getCellType(i + k, j) == t){
-                                sum--;
-                            } else if(b.getCellType(i + k, j) != Token.Empty){
-                                sum++;
-                            }
-                        }
-                    }
-                    if(sum == 2){
-                        options.add(new Point(i, j));
-                    }
-                }
-            }
-        }
-
-        if(!options.isEmpty()) {
-            return options.get(this.r.nextInt(options.size()));
-        }
-        return null;
-    }
-
-    private Point defenceMoves(Board b, Token t){
-        if(b.getCellType(1, 1) == Token.Empty){
-            return new Point(1, 1);
-        } else {
-            return this.chooseRandomCorner(b, t);
-        }
-    }
 
     private Point chooseRandomCorner(Board b, Token t){
         ArrayList<Point> options = new ArrayList<>();
