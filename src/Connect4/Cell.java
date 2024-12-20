@@ -1,7 +1,10 @@
 package Connect4;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.Objects;
 
 public class Cell {
@@ -44,15 +47,28 @@ public class Cell {
 
     private void loadIcons(String xImagePath, String oImagePath) {
         try {
-            // Mengubah ukuran gambar X dan O agar proporsional dengan tombol
-            Image xImage = new ImageIcon(getClass().getResource(xImagePath)).getImage().getScaledInstance(80, 800, Image.SCALE_SMOOTH);
-            Image oImage = new ImageIcon(getClass().getResource(oImagePath)).getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
-            xIcon = new ImageIcon(xImage);
-            oIcon = new ImageIcon(oImage);
+            // Muat gambar langsung sebagai ImageIcon
+            xIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource(xImagePath)));
+            oIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource(oImagePath)));
+            xIcon = resizeIcon(xImagePath, 80, 80);
+            oIcon = resizeIcon(oImagePath, 80, 80);
+
         } catch (NullPointerException e) {
-            System.err.println("Icon image not found: " + xImagePath + " or " + oImagePath);
+            System.err.println("Error loading icon images: " + e.getMessage());
         }
     }
+
+    private ImageIcon resizeIcon(String imagePath, int width, int height) {
+        try {
+            Image img = new ImageIcon(Objects.requireNonNull(getClass().getResource(imagePath))).getImage();
+            Image resizedImg = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+            return new ImageIcon(resizedImg);
+        } catch (NullPointerException e) {
+            System.err.println("Error resizing icon: " + e.getMessage());
+            return null;
+        }
+    }
+
 
 
     private class BackgroundPanel extends JPanel {
@@ -88,25 +104,19 @@ public class Cell {
                 buttons[row][col].setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
                 buttons[row][col].setEnabled(true); // Disable semua tombol kecuali baris paling atas
 
-
                 // Border kosong di tombol
                 buttons[row][col].setOpaque(true);
                 buttons[row][col].setBackground(new Color(255, 255, 255, 50)); // Warna tombol sesuai tema
-
-
 
                 int finalCol = col;
                 buttons[row][col].addActionListener(e -> handleMove(finalCol));
                 //buttons[row][col].setForeground(Color.WHITE); // Warna teks pada tombol
 
-
                 buttons[row][col].setContentAreaFilled(false);
                 buttons[row][col].setBorderPainted(true);
 
                 panels.add(buttons[row][col]);
-
             }
-
         }
 
         // Menambahkan panel ke frame
