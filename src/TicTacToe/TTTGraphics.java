@@ -153,8 +153,17 @@ public class TTTGraphics {
     private void startGame(boolean vsAI, AILevel aiLevel) {
         // Input nama pemain
         player1Name = JOptionPane.showInputDialog(frame, "Enter Player 1 Name:");
+        if (player1Name == null || player1Name.trim().isEmpty()) { // [Modified] Validasi nama pemain 1
+            JOptionPane.showMessageDialog(frame, "Player 1 name is required!", "Error", JOptionPane.ERROR_MESSAGE);
+            return; // Kembali ke menu jika nama tidak diisi
+        }
+
         if (!vsAI) {
             player2Name = JOptionPane.showInputDialog(frame, "Enter Player 2 Name:");
+            if (player2Name == null || player2Name.trim().isEmpty()) { // [Modified] Validasi nama pemain 2
+                JOptionPane.showMessageDialog(frame, "Player 2 name is required!", "Error", JOptionPane.ERROR_MESSAGE);
+                return; // Kembali ke menu jika nama tidak diisi
+            }
         } else {
             player2Name = "Computer";
         }
@@ -165,7 +174,12 @@ public class TTTGraphics {
                 frame, "Choose Player 1 Token:", "Token Selection",
                 JOptionPane.PLAIN_MESSAGE, null, options, Token.X
         );
+        if (player1Token == null) { // [Modified] Validasi token pemain 1
+            JOptionPane.showMessageDialog(frame, "Player 1 token selection is required!", "Error", JOptionPane.ERROR_MESSAGE);
+            return; // Kembali ke menu jika token tidak dipilih
+        }
 
+        // Tentukan token pemain 2 berdasarkan pilihan pemain 1
         player2Token = (player1Token == Token.X) ? Token.O : Token.X;
 
         // Membuat dan memulai game
@@ -173,4 +187,5 @@ public class TTTGraphics {
         game = new Cell(board, vsAI, aiLevel, frame, player1Name, player2Name, player1Token, player2Token);
         game.start("/TicTacToe/image/bc_malam.jpg");
     }
+
 }
