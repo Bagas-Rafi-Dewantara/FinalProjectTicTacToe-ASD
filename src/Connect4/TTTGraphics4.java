@@ -27,7 +27,7 @@ public class TTTGraphics4 {
 
         try {
             // Muat gambar background dari folder src atau path lain
-            bgImage3 = ImageIO.read(getClass().getResource("image/TTT.jpg"));  // Pastikan path sudah benar
+            bgImage3 = ImageIO.read(getClass().getResource("image/C4bg.jpg"));  // Pastikan path sudah benar
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -52,11 +52,19 @@ public class TTTGraphics4 {
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.insets = new Insets(20, 20, 20, 20); // Menambahkan margin antar elemen
 
+        JLabel label = new JLabel("              ", SwingConstants.CENTER);
+        JLabel label2 = new JLabel("              ", SwingConstants.CENTER);
+
+        label.setFont(new Font("Times New Roman", Font.BOLD, 30));
+        label2.setFont(new Font("Times New Roman", Font.BOLD, 30));
         JButton vsHuman = new JButton("Player vs Player");
         JButton vsAI = new JButton("Player vs Computer");
 
         vsHuman.setFont(new Font("Times New Roman", Font.BOLD, 40));
         vsAI.setFont(new Font("Times New Roman", Font.BOLD, 40));
+        label.setForeground(Color.white);
+        label2.setForeground(Color.white);
+
         vsHuman.setForeground(Color.white);
         vsAI.setForeground(Color.white);
 
@@ -65,6 +73,8 @@ public class TTTGraphics4 {
 
         vsHuman.addActionListener(e -> startGame(false)); // Player vs Player
         vsAI.addActionListener(e -> startGame(true)); // Player vs Computer
+
+        C4Panel.add(label, gbc);
 
         gbc.gridy = 1; // Pindahkan tombol ke baris berikutnya
         C4Panel.add(vsHuman, gbc);
