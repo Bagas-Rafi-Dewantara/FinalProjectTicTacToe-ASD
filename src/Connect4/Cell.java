@@ -185,8 +185,8 @@ public class Cell {
     private String getPointsText() { // Format teks horizontal untuk skor
         return String.format(
                 "%s: %d    |    %s: %d    |    Games Played: %d",
-                player1Name, player1Points,
                 player2Name, player2Points,
+                player1Name, player1Points,
                 totalGames
         );
     }
