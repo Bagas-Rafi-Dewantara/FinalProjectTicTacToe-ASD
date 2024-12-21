@@ -84,7 +84,6 @@ public class Cell {
             }
         }
     }
-
     public void start(String backgroundPath) {
         // Load background image
         loadBackgroundImage(backgroundPath);
@@ -185,8 +184,8 @@ public class Cell {
     private String getPointsText() { // Format teks horizontal untuk skor
         return String.format(
                 "%s: %d    |    %s: %d    |    Games Played: %d",
-                player2Name, player2Points,
                 player1Name, player1Points,
+                player2Name, player2Points,
                 totalGames
         );
     }
